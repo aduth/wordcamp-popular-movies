@@ -103,4 +103,7 @@ movies = new App.Collections.Movies();
 movieList = new App.Views.MovieList( { collection: movies } );
 
 movieList.render();
-movies.fetch();
+movies.fetch( {
+	data: { posts_per_page: -1 },
+    processData: true
+} );
