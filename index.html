@@ -5,22 +5,26 @@
 	<title>Popular Movies</title>
 
 	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,700,900">
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-<header class="site-header">
-	<h1 class="brand">Popular Movies of 2014</h1>
-</header>
-
 <main id="main"></main>
+
+<script id="tmpl-app" type="text/x-template">
+	<header class="site-header">
+		<a href="/" class="site-header__brand">
+			<h1>Popular Movies</h1>
+		</a>
+	</header>
+</script>
 
 <script id="tmpl-list-item" type="text/x-template">
 	<figure class="movie-list-item__figure">
 		<% if ( 'undefined' !== typeof poster ) { %>
 		<img src="<%= poster.source_url %>" alt="<%= title.rendered %>" class="movie-list-item__poster">
 		<% } %>
-		<a href="/<%= slug %>" class="movie-list-item__link">
+		<a href="/movie/<%= slug %>" class="movie-list-item__link">
 			<figcaption class="movie-list-item__title"><%= title.rendered %></figcaption>
 		</a>
 	</figure>
@@ -30,8 +34,8 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.2/underscore-min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.2/backbone-min.js"></script>
 <script>window.WP_API_Settings = { root: 'http://wordpress.dev/wp-json/wp' };</script>
-<script src="wp-api.js"></script>
-<script src="app.js"></script>
+<script src="/wp-api.js"></script>
+<script src="/app.js"></script>
 
 </body>
 </html>

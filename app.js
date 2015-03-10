@@ -47,6 +47,29 @@ App.Collections.Movies = wp.api.collections.Posts.extend( {
 
 App.Views = {};
 
+App.Views.App = Backbone.View.extend( {
+	el: '#main',
+
+	template: _.template( $( '#tmpl-app' ).html() ),
+
+	navigate: function( view ) {
+		if ( this.currentView ) {
+			this.currentView.remove();
+		}
+
+		this.currentView = view;
+		this.render();
+	},
+
+	render: function() {
+		this.$el.html( this.template() );
+
+		if ( this.currentView ) {
+			this.$el.append( this.currentView.$el );
+		}
+	}
+} );
+
 App.Views.MovieList = Backbone.View.extend( {
 	tagName: 'ul',
 
@@ -66,7 +89,7 @@ App.Views.MovieList = Backbone.View.extend( {
 		} );
 
 		this.$el.html( markup );
-		$( '#main' ).html( this.$el );
+		return this;
 	}
 } );
 
@@ -92,18 +115,50 @@ App.Views.MovieListItem = Backbone.View.extend( {
  * Routing
  */
 
+App.Router = Backbone.Router.extend( {
+	routes: {
+		'': 'index',
+		'movie/:movie': 'detail'
+	},
+
+	initialize: function( options ) {
+		_.extend( this, options );
+	},
+
+	index: function() {
+		var movies;
+
+		if ( ! this.movieList ) {
+			movies = new App.Collections.Movies();
+
+			movies.fetch( {
+				data: { posts_per_page: -1 },
+			    processData: true
+			} );
+
+			this.movieList = new App.Views.MovieList( { collection: movies } );
+		}
+
+		this.movieList.render();
+		this.appView.navigate( this.movieList );
+	},
+
+	detail: function( movie ) {
+		console.log( 'Movie Detail' );
+		this.appView.navigate( /* TODO */ );
+	}
+} );
 
 /**
  * Initialization
  */
 
-var movies, movieList;
-
-movies = new App.Collections.Movies();
-movieList = new App.Views.MovieList( { collection: movies } );
-
-movieList.render();
-movies.fetch( {
-	data: { posts_per_page: -1 },
-    processData: true
+new App.Router( {
+	appView: new App.Views.App()
 } );
+Backbone.history.start( { pushState: true } );
+
+$( document ).on( 'click', 'a', function( e ) {
+	e.preventDefault();
+	Backbone.history.navigate( this.pathname, true );
+});

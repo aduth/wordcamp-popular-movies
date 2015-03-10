@@ -35,6 +35,11 @@ h1 {
 	text-align: center;
 }
 
+.site-header__brand {
+	text-decoration: none;
+	color: #483949;
+}
+
 .movie-list {
 	display: flex;
 	flex-wrap: wrap;
