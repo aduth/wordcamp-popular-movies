@@ -1,3 +1,7 @@
+/**
+ * Element
+ */
+
 *,
 *:before,
 *:after {
@@ -17,6 +21,8 @@ body {
 	background-color: #f0f4f4;
 	font-family: Source Sans Pro, sans-serif;
 	font-weight: 300;
+	font-size: 18px;
+	line-height: 1.3;
 	color: #483949;
 }
 
@@ -29,6 +35,19 @@ h1 {
 	font-size: 3em;
 }
 
+a {
+	color: #c1625c;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #d6756f;
+}
+
+/**
+ * Layout
+ */
+
 .site-header {
 	padding: 14px 0;
 	background-color: white;
@@ -36,17 +55,24 @@ h1 {
 }
 
 .site-header__brand {
-	text-decoration: none;
 	color: #483949;
 }
+
+.main {
+	max-width: 880px;
+	margin: 40px auto;
+}
+
+/**
+ * Movie List
+ */
 
 .movie-list {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-around;
 	list-style-type: none;
-	max-width: 880px;
-	margin: 40px auto;
+	margin: 0;
 	padding: 0;
 }
 
@@ -99,4 +125,43 @@ h1 {
 	line-height: 1;
 	text-align: center;
 	color: white;
+}
+
+/**
+ * Movie Detail
+ */
+
+.movie-detail__return {
+	position: relative;
+	display: inline-block;
+	padding-left: 29px;
+	font-size: 16px;
+	text-transform: uppercase;
+	line-height: 24px;
+}
+
+.movie-detail__return-icon {
+	position: absolute;
+	left: 0;
+	font-size: 24px;
+}
+
+.movie-detail__content {
+	margin-top: 40px;
+}
+
+.movie-detail__poster {
+	float: left;
+	max-width: 25%;
+	margin-right: 5%;
+}
+
+.movie-detail__title {
+	margin: 0 0 20px;
+	font-size: 50px;
+	line-height: 1;
+}
+
+.movie-detail__description {
+	font-size: 24px;
 }

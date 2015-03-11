@@ -7,11 +7,20 @@ var App = {};
 App.Models = {};
 
 App.Models.Movie = wp.api.models.Post.extend( {
-	urlRoot: WP_API_Settings.root + '/movies',
+	idAttribute: 'slug',
 
 	initialize: function() {
 		this.syncMedia();
 		this.on( 'change:featured_image', this.syncMedia );
+	},
+
+	url: function() {
+		return WP_API_Settings.root + '/movies/?name=' + this.id;
+	},
+
+	parse: function( response ) {
+		var movie = Array.isArray( response ) ? response[0] : response;
+		return wp.api.models.Post.prototype.parse.call( this, movie );
 	},
 
 	syncMedia: function() {
@@ -48,7 +57,7 @@ App.Collections.Movies = wp.api.collections.Posts.extend( {
 App.Views = {};
 
 App.Views.App = Backbone.View.extend( {
-	el: '#main',
+	el: '#app',
 
 	template: _.template( $( '#tmpl-app' ).html() ),
 
@@ -65,7 +74,7 @@ App.Views.App = Backbone.View.extend( {
 		this.$el.html( this.template() );
 
 		if ( this.currentView ) {
-			this.$el.append( this.currentView.$el );
+			this.$el.find( '#main' ).html( this.currentView.$el );
 		}
 	}
 } );
@@ -111,6 +120,22 @@ App.Views.MovieListItem = Backbone.View.extend( {
 	}
 } );
 
+App.Views.MovieDetail = Backbone.View.extend( {
+	template: _.template( $( '#tmpl-detail' ).html() ),
+
+	className: 'movie-detail',
+
+	initialize: function() {
+		this.listenTo( this.model, 'change', this.render );
+	},
+
+	render: function() {
+		var markup = this.template( this.model.toJSON() );
+		this.$el.html( markup );
+		return this;
+	}
+} );
+
 /**
  * Routing
  */
@@ -118,7 +143,7 @@ App.Views.MovieListItem = Backbone.View.extend( {
 App.Router = Backbone.Router.extend( {
 	routes: {
 		'': 'index',
-		'movie/:movie': 'detail'
+		'movie/:slug': 'detail'
 	},
 
 	initialize: function( options ) {
@@ -126,26 +151,32 @@ App.Router = Backbone.Router.extend( {
 	},
 
 	index: function() {
-		var movies;
+		var view = new App.Views.MovieList( {
+			collection: this.movies
+		} ).render();
 
-		if ( ! this.movieList ) {
-			movies = new App.Collections.Movies();
+		this.appView.navigate( view );
 
-			movies.fetch( {
-				data: { posts_per_page: -1 },
-			    processData: true
-			} );
-
-			this.movieList = new App.Views.MovieList( { collection: movies } );
-		}
-
-		this.movieList.render();
-		this.appView.navigate( this.movieList );
+		this.movies.fetch( {
+			data: { posts_per_page: -1 },
+			processData: true
+		} );
 	},
 
-	detail: function( movie ) {
-		console.log( 'Movie Detail' );
-		this.appView.navigate( /* TODO */ );
+	detail: function( slug ) {
+		var movie = this.movies.get( slug ),
+			view;
+
+		if ( ! movie ) {
+			movie = new App.Models.Movie( { slug: slug } );
+			movie.fetch();
+		}
+
+		view = new App.Views.MovieDetail( {
+			model: movie
+		} ).render();
+
+		this.appView.navigate( view );
 	}
 } );
 
@@ -154,7 +185,8 @@ App.Router = Backbone.Router.extend( {
  */
 
 new App.Router( {
-	appView: new App.Views.App()
+	appView: new App.Views.App(),
+	movies: new App.Collections.Movies()
 } );
 Backbone.history.start( { pushState: true } );
 
